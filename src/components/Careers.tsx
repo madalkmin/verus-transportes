@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type DragEvent, type FormEvent } from 'rea
 import { wa } from '../data'
 import { lockScroll } from '../lenis'
 import { WhatsApp } from './icons'
+import { Input, TextArea, useSpamGuard } from './Field'
 import Select from './Select'
 import { Reveal, ease } from './ui'
 
@@ -71,6 +72,7 @@ function CareersModal({ onClose }: { onClose: () => void }) {
   const [file, setFile] = useState<File | null>(null)
   const [missingFile, setMissingFile] = useState(false)
   const [sent, setSent] = useState(false)
+  const { honeypot, isSpam } = useSpamGuard()
   const canShare = !!file && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })
 
   useEffect(() => {
@@ -83,6 +85,7 @@ function CareersModal({ onClose }: { onClose: () => void }) {
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!file) return setMissingFile(true)
+    if (isSpam(e.currentTarget)) return setSent(true)
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>
     const text = [
       '*Trabalhe conosco: candidatura pelo site*',
@@ -156,13 +159,14 @@ function CareersModal({ onClose }: { onClose: () => void }) {
               <p className="mt-2 text-sm text-mute">Preencha seus dados e anexe o currículo. O envio é feito pelo WhatsApp direto para o nosso RH.</p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <input name="nome" required placeholder="Nome completo *" className="field sm:col-span-2" autoComplete="name" />
-                <input name="email" required type="email" placeholder="E-mail *" className="field" autoComplete="email" />
-                <input name="telefone" required type="tel" placeholder="Telefone / WhatsApp *" className="field" autoComplete="tel" />
+                {honeypot}
+                <Input mask="name" fullName name="nome" required placeholder="Nome completo *" autoComplete="name" className="sm:col-span-2" />
+                <Input mask="email" name="email" required placeholder="E-mail *" autoComplete="email" />
+                <Input mask="phone" name="telefone" required placeholder="(19) 99999-9999 *" autoComplete="tel" />
                 <Select name="area" options={areas} placeholder="Área de interesse *" required className="sm:col-span-2" />
                 <Dropzone file={file} onFile={(f) => { setFile(f); setMissingFile(false) }} />
                 {missingFile && <p className="-mt-2 text-xs text-red-400 sm:col-span-2">Anexe seu currículo para continuar.</p>}
-                <textarea name="obs" rows={3} placeholder="Conte um pouco sobre você (opcional)" className="field resize-none sm:col-span-2" />
+                <TextArea name="obs" rows={3} limit={400} placeholder="Conte um pouco sobre você (opcional)" className="sm:col-span-2" />
                 <button className="group relative mt-2 flex items-center justify-center gap-2 overflow-hidden rounded-full bg-brand px-6 py-4 font-semibold text-black sm:col-span-2">
                   <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
                   <span className="relative flex items-center gap-2"><WhatsApp className="size-5" /> Enviar pelo WhatsApp</span>

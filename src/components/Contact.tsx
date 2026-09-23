@@ -3,6 +3,7 @@ import { ArrowUpRight, Clock, Mail, MapPin, Navigation, Phone, Send } from 'luci
 import { useState, type FormEvent } from 'react'
 import { company, tel, wa } from '../data'
 import { WhatsApp } from './icons'
+import { Input, TextArea, useSpamGuard } from './Field'
 import Select from './Select'
 import { Reveal, SectionHead, ease } from './ui'
 
@@ -12,9 +13,11 @@ const cargo = ['Carga fechada', 'Frete expresso', 'Armazenagem', 'Outro']
 export function Quote() {
   const [tab, setTab] = useState<(typeof tabs)[number]>('Cotação de frete')
   const [sent, setSent] = useState(false)
+  const { honeypot, isSpam } = useSpamGuard()
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (isSpam(e.currentTarget)) return setSent(true)
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>
     const lines =
       tab === 'Cotação de frete'
@@ -50,19 +53,27 @@ export function Quote() {
           </motion.div>
         ) : (
           <motion.form key={tab} onSubmit={submit} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4, ease }} className="mt-8 grid gap-4 sm:grid-cols-2">
-            <input name="nome" required placeholder="Seu nome *" className="field" autoComplete="name" />
-            {tab === 'Cotação de frete' && <input name="empresa" placeholder="Empresa" className="field" autoComplete="organization" />}
-            <input name="telefone" required placeholder="Telefone / WhatsApp *" className="field" type="tel" autoComplete="tel" />
-            <input name="email" required placeholder="E-mail *" className="field" type="email" autoComplete="email" />
+            {honeypot}
+            <Input mask="name" name="nome" required placeholder="Seu nome *" autoComplete="name" className={tab === 'Mensagem' ? 'sm:col-span-2' : ''} />
+            {tab === 'Cotação de frete' && <Input mask="company" name="empresa" placeholder="Empresa" autoComplete="organization" />}
+            <Input mask="phone" name="telefone" required placeholder="(19) 99999-9999 *" autoComplete="tel" />
+            <Input mask="email" name="email" required placeholder="E-mail *" autoComplete="email" />
             {tab === 'Cotação de frete' && (
               <>
                 <Select name="servico" options={cargo} defaultValue={cargo[0]} className="sm:col-span-2" />
-                <input name="origem" required placeholder="Cidade de origem *" className="field" />
-                <input name="destino" required placeholder="Cidade de destino *" className="field" />
-                <input name="peso" placeholder="Peso / volume aproximado" className="field sm:col-span-2" />
+                <Input mask="city" name="origem" required placeholder="Cidade de origem (ex: Limeira/SP) *" />
+                <Input mask="city" name="destino" required placeholder="Cidade de destino *" />
+                <Input mask="measure" name="peso" placeholder="Peso / volume aproximado (ex: 12 t, 30 m³)" className="sm:col-span-2" />
               </>
             )}
-            <textarea name="obs" required={tab === 'Mensagem'} rows={4} placeholder={tab === 'Mensagem' ? 'Sua mensagem *' : 'Observações (tipo de carga, data desejada...)'} className="field resize-none sm:col-span-2" />
+            <TextArea
+              name="obs"
+              required={tab === 'Mensagem'}
+              rows={4}
+              limit={tab === 'Mensagem' ? 800 : 400}
+              placeholder={tab === 'Mensagem' ? 'Sua mensagem *' : 'Observações (tipo de carga, data desejada...)'}
+              className="sm:col-span-2"
+            />
             <button className="group relative mt-2 flex items-center justify-center gap-2 overflow-hidden rounded-full bg-brand px-6 py-4 font-semibold text-black sm:col-span-2">
               <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
               <span className="relative flex items-center gap-2">Enviar pelo WhatsApp <Send className="size-4 transition-transform group-hover:translate-x-1" /></span>
