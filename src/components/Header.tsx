@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/
 import { ArrowUpRight, Menu, Phone, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { company, nav, tel } from '../data'
+import { lockScroll } from '../lenis'
 import { ease } from './ui'
 
 export default function Header() {
@@ -26,7 +27,7 @@ export default function Header() {
     return () => io.disconnect()
   }, [])
 
-  useEffect(() => { document.body.style.overflow = open ? 'hidden' : '' }, [open])
+  useEffect(() => lockScroll(open), [open])
 
   return (
     <>

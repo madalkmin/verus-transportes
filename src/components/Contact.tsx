@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowUpRight, Briefcase, Clock, Mail, MapPin, Navigation, Phone, Send } from 'lucide-react'
+import { ArrowUpRight, Clock, Mail, MapPin, Navigation, Phone, Send } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { company, tel, wa } from '../data'
 import { WhatsApp } from './icons'
+import Select from './Select'
 import { Reveal, SectionHead, ease } from './ui'
 
 const tabs = ['Cotação de frete', 'Mensagem'] as const
@@ -55,9 +56,7 @@ export function Quote() {
             <input name="email" required placeholder="E-mail *" className="field" type="email" autoComplete="email" />
             {tab === 'Cotação de frete' && (
               <>
-                <select name="servico" className="field sm:col-span-2" defaultValue={cargo[0]}>
-                  {cargo.map((c) => <option key={c}>{c}</option>)}
-                </select>
+                <Select name="servico" options={cargo} defaultValue={cargo[0]} className="sm:col-span-2" />
                 <input name="origem" required placeholder="Cidade de origem *" className="field" />
                 <input name="destino" required placeholder="Cidade de destino *" className="field" />
                 <input name="peso" placeholder="Peso / volume aproximado" className="field sm:col-span-2" />
@@ -135,37 +134,6 @@ export default function Contact() {
                   Waze <ArrowUpRight className="size-3.5" />
                 </a>
               </div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
-export function Careers() {
-  return (
-    <section className="py-24">
-      <div className="container-x">
-        <Reveal>
-          <div className="grain relative overflow-hidden rounded-[2rem] bg-brand p-10 text-black sm:p-16">
-            <motion.div
-              className="absolute -right-10 -top-10 size-72 rounded-full border-[40px] border-black/10"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-            />
-            <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
-              <div>
-                <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em]"><Briefcase className="size-4" /> Trabalhe conosco</span>
-                <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">Faça parte do time Verus.</h2>
-                <p className="mt-4 max-w-xl text-black/70">Motoristas, operadores e equipe administrativa: envie seu currículo e venha rodar com a gente.</p>
-              </div>
-              <a
-                href={`mailto:${company.email}?subject=${encodeURIComponent('Trabalhe conosco - Currículo')}`}
-                className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-black px-7 py-4 font-semibold text-white transition hover:bg-ink-3"
-              >
-                Enviar currículo <ArrowUpRight className="size-4 transition-transform group-hover:rotate-45" />
-              </a>
             </div>
           </div>
         </Reveal>

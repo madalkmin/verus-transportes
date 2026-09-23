@@ -1,13 +1,15 @@
-import { AnimatePresence, motion } from 'motion/react'
+import { motion, useInView } from 'motion/react'
 import { ArrowLeft, ArrowRight, Quote } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { testimonials } from '../data'
 import { SectionHead, ease } from './ui'
 
 export default function Testimonials() {
   const [i, setI] = useState(0)
-  const [paused, setPaused] = useState(false)
-  const t = testimonials[i]
+  const [hover, setHover] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { margin: '-20% 0px' })
+  const paused = hover || !inView
   const go = (d: number) => setI((v) => (v + d + testimonials.length) % testimonials.length)
 
   useEffect(() => {
@@ -32,17 +34,20 @@ export default function Testimonials() {
           </div>
         </div>
 
-        <div className="lg:col-span-8" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <div className="lg:col-span-8" ref={ref} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
           <div className="relative rounded-[2rem] border border-white/10 bg-ink-2 p-8 sm:p-14">
             <Quote className="size-12 text-brand" />
-            <div className="min-h-[260px] sm:min-h-[220px]">
-              <AnimatePresence mode="wait">
+            {/* todos os depoimentos ocupam a mesma célula do grid: a altura fica fixa na do maior, sem empurrar a página ao trocar */}
+            <div className="grid">
+              {testimonials.map((t, k) => (
                 <motion.blockquote
-                  key={i}
-                  initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -20, filter: 'blur(6px)' }}
-                  transition={{ duration: 0.6, ease }}
+                  key={t.name}
+                  aria-hidden={k !== i}
+                  className="[grid-area:1/1]"
+                  initial={false}
+                  animate={k === i ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 16, filter: 'blur(6px)' }}
+                  transition={{ duration: 0.6, ease, delay: k === i ? 0.25 : 0 }}
+                  style={{ pointerEvents: k === i ? 'auto' : 'none' }}
                 >
                   <p className="mt-8 font-display text-xl leading-relaxed sm:text-2xl lg:text-[1.7rem]">“{t.quote}”</p>
                   <footer className="mt-10 flex items-center gap-4">
@@ -55,7 +60,7 @@ export default function Testimonials() {
                     </span>
                   </footer>
                 </motion.blockquote>
-              </AnimatePresence>
+              ))}
             </div>
             <div className="mt-10 flex gap-2">
               {testimonials.map((_, k) => (

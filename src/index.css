@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
 
 @theme {
   --color-ink: #0a0a0b;
@@ -13,6 +14,22 @@
 }
 
 html { scroll-behavior: auto; }
+
+/* scrollbar na paleta da marca */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-ink); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--color-brand), #c9650f);
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-brand-2); }
+::-webkit-scrollbar-corner { background: var(--color-ink); }
+@supports not selector(::-webkit-scrollbar) {
+  html { scrollbar-color: var(--color-brand) var(--color-ink); scrollbar-width: thin; }
+}
+[role='listbox']::-webkit-scrollbar, [role='dialog']::-webkit-scrollbar { width: 6px; }
+[role='listbox']::-webkit-scrollbar-track, [role='dialog']::-webkit-scrollbar-track { background: transparent; }
 body {
   @apply bg-ink text-white font-sans antialiased;
   overflow-x: hidden;

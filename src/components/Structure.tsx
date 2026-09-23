@@ -2,9 +2,15 @@ import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react'
 import { ChevronLeft, ChevronRight, Play, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { company, gallery } from '../data'
+import { lockScroll } from '../lenis'
 import { Reveal, SectionHead, ease } from './ui'
 
 function Lightbox({ index, onClose, onNav }: { index: number; onClose: () => void; onNav: (d: number) => void }) {
+  useEffect(() => {
+    lockScroll(true)
+    return () => lockScroll(false)
+  }, [])
+
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
