@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0a0a0b;
+  --color-ink-2: #121214;
+  --color-ink-3: #1b1b1f;
+  --color-line: #26262c;
+  --color-mute: #9a9aa3;
+  --color-brand: #f58220;
+  --color-brand-2: #ffa24c;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+html { scroll-behavior: auto; }
+body {
+  @apply bg-ink text-white font-sans antialiased;
+  overflow-x: hidden;
+}
+::selection { background: var(--color-brand); color: #000; }
+
+.container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+
+.eyebrow {
+  @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand;
+}
+.eyebrow::before { content: ''; @apply h-px w-8 bg-brand; }
+
+.text-gradient {
+  background: linear-gradient(100deg, #fff 0%, #ffd2a8 45%, var(--color-brand) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.grain::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .06; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / .04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / .04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 40s linear infinite; }
+
+@keyframes road { to { stroke-dashoffset: -200; } }
+
+.field {
+  @apply w-full rounded-xl border border-line bg-ink-3/60 px-4 py-3 text-sm text-white placeholder:text-mute/70 outline-none transition focus:border-brand focus:bg-ink-3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
